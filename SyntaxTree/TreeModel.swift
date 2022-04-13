@@ -11,20 +11,13 @@ import Foundation
  // MARK: X' -> X Complement
  */
 
-func spc(_ amt: String) -> String {
-	var result = ""
-	for _ in 1..<Int(amt.count/2) {
-		result += " "
-	}
-	return result
-}
-
-class Node {
+class Node: CustomStringConvertible {
 	var label: String
 	
 	init(label: String) {
 		self.label = label
 	}
+	var description: String { label }
 }
 
 class XP: Node {
@@ -36,12 +29,12 @@ class XP: Node {
 		self.xBar = xBar
 		super.init(label: label)
 	}
-	
-	func getXP() -> String {
+
+	override var description: String {
 		if spec == nil {
-			return "\(label)\n\(spc(label))|\n\(xBar.geteXbar())"
+			return "\(label)\n|\n\(xBar.description)"
 		} else {
-			return "\(label)\n\(spc(label))/\\\n\(spec?.getXP() ?? "XP") \(xBar.geteXbar())"
+			return "\(label)\n/\\\n\(spec?.description ?? "XP") \(xBar.description)"
 		}
 	}
 }
@@ -60,15 +53,15 @@ class XBar: Node {
 		super.init(label: label)
 	}
 
-	func geteXbar() -> String {
+	override var description: String {
 		if adjunct == nil, compliment == nil, xBar == nil, head != nil {
-			return "\(label)\n\(spc(label))|\n\(head?.getX() ?? "head")"
+			return "\(label)\n|\n\(head?.description ?? "head")"
 		} else if adjunct == nil, xBar == nil, compliment != nil, head != nil {
-			return"\(label)\n\(spc(label))/\\\n\(head?.getX() ?? "head") \(compliment?.getXP() ?? "XP")"
+			return"\(label)\n/\\\n\(head?.description ?? "head") \(compliment?.description ?? "XP")"
 		} else if adjunct != nil, xBar != nil, compliment == nil, head == nil {
-			return"\(label)\n\(spc(label))/\\\n\(adjunct?.getXP() ?? "XP") \(xBar?.geteXbar() ?? "XBar")"
+			return"\(label)\n/\\\n\(adjunct?.description ?? "XP") \(xBar?.description ?? "XBar")"
 		} else if adjunct == nil, compliment == nil, xBar != nil, head == nil {
-			return "\(label)\n\(spc(label))|\n\(xBar?.geteXbar() ?? "XBar")"
+			return "\(label)\n|\n\(xBar?.description ?? "XBar")"
 		}
 		return "Shouldn't be here"
 	}
@@ -81,20 +74,8 @@ class X: Node {
 		self.value = value
 		super.init(label: label)
 	}
-	
-	func getX() -> String {
-		return "\(label)\n\(value)"
+
+	override var description: String {
+		"\(label)\n\(value)"
 	}
 }
-
-let N = X(label: "N", value: "Noun")
-let NBar = XBar(label: "N-Bar", adjunct: nil, xBar: nil, head: N, compliment: nil)
-let NP = XP(label: "NP", spec: nil, xBar: NBar)
-
-let D = X(label: "D", value: "The")
-let DBar1 = XBar(label: "D'", adjunct: nil, xBar: nil, head: D, compliment: NP)
-let DBar2 = XBar(label: "D'", adjunct: nil, xBar: DBar1, head: nil, compliment: nil)
-let DP = XP(label: "DP", spec: nil, xBar: DBar2)
-
-print(DP.getXP())
-
